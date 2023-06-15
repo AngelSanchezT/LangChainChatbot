@@ -5,6 +5,28 @@ from PyPDF2 import PdfReader, PdfWriter
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
 
+def get_pdf_pages(pdf_docs):
+    all_pages = []
+    for pdf in pdf_docs:
+        pdf_reader = PdfReader(pdf)
+        pdf_writer = PdfWriter()
+
+        for page in pdf_reader.pages:
+            pdf_writer.add_page(page)
+        
+        with open(pdf.name, 'wb') as output_file:
+            pdf_writer.write(output_file)
+        text_splitter = CharacterTextSplitter(
+            separator="\n\n",
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        loader = PyPDFLoader(pdf.name)
+        pdf_pages = loader.load_and_split(text_splitter=text_splitter)
+        all_pages += pdf_pages
+    return all_pages
+
 def main():
     load_dotenv()
     st.set_page_config(page_title="Chat con multiples PDFs", page_icon=":books:")
@@ -19,6 +41,6 @@ def main():
         st.subheader("Tus documentos")
         pdf_docs = st.file_uploader("Sube tus PDFs aquí y haz click en 'Procesar'", accept_multiple_files=True)
 
-	
+
 if __name__ == '__main__':
     main()

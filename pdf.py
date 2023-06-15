@@ -4,6 +4,10 @@ from htmlcss import bot_template, user_template, css
 from PyPDF2 import PdfReader, PdfWriter
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+from langchain.indexes import VectorstoreIndexCreator
 
 def get_pdf_pages(pdf_docs):
     all_pages = []

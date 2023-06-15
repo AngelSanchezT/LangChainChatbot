@@ -1,7 +1,7 @@
 import streamlit as st
 from dotenv import load_dotenv
 from htmlcss import bot_template, user_template, css
-# from PyPDF2 import PdfReader, PdfWriter
+from PyPDF2 import PdfReader, PdfWriter
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
 from langchain.chat_models import ChatOpenAI
@@ -9,11 +9,9 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.indexes import VectorstoreIndexCreator
 
-
 def get_pdf_pages(pdf_docs):
     all_pages = []
     for pdf in pdf_docs:
-        from PyPDF2 import PdfReader, PdfWriter
         pdf_reader = PdfReader(pdf)
         pdf_writer = PdfWriter()
 
@@ -33,7 +31,6 @@ def get_pdf_pages(pdf_docs):
         all_pages += pdf_pages
     return all_pages
 
-
 def handle_userinput(user_question):
     response = st.session_state.conversation({'question': user_question})
     st.session_state.chat_history = response['chat_history']
@@ -46,7 +43,6 @@ def handle_userinput(user_question):
             st.write(bot_template.replace(
                 "{{MSG}}", message.content), unsafe_allow_html=True)
 
-
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
@@ -56,7 +52,6 @@ def get_conversation_chain(vectorstore):
         memory=memory
     )
     return conversation_chain
-
 
 def main():
     load_dotenv()
@@ -78,6 +73,7 @@ def main():
                 all_pdfs_pages = get_pdf_pages(pdf_docs)
                 index = VectorstoreIndexCreator().from_documents(all_pdfs_pages)
                 st.session_state.conversation = get_conversation_chain(index.vectorstore)
+
 
 if __name__ == '__main__':
     main()

@@ -63,9 +63,16 @@ def main():
         st.session_state.chat_history = None
     st.header("Chat con multiples PDFs :books:")
     user_question = st.text_input("Pregúntale lo que quieras a tus documentos PDFs:")
+    if user_question:
+        handle_userinput(user_question)
     with st.sidebar:
         st.subheader("Tus documentos")
         pdf_docs = st.file_uploader("Sube tus PDFs aquí y haz click en 'Procesar'", accept_multiple_files=True)
+        if st.button("Procesar"):
+            with st.spinner("Procesando..."):
+                all_pdfs_pages = get_pdf_pages(pdf_docs)
+                index = VectorstoreIndexCreator().from_documents(all_pdfs_pages)
+                st.session_state.conversation = get_conversation_chain(index.vectorstore)
 
 
 if __name__ == '__main__':
